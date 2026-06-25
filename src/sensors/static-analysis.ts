@@ -1,27 +1,46 @@
-import { execa } from 'execa';
-import { SensorReading } from './types';
+import { execa } from "execa";
+import { SensorReading } from "./types";
 
-export async function analyzeRepository(repositoryId: string, repoPath: string): Promise<SensorReading[]> {
+export async function analyzeRepository(
+  repositoryId: string,
+  repoPath: string,
+): Promise<SensorReading[]> {
   const readings: SensorReading[] = [];
   const baseTime = new Date();
 
-  const commands: Array<{ cmd: string; source: SensorReading['source']; category: string }> = [
-    { cmd: 'npm run lint --silent 2>&1 || true', source: 'static_analysis', category: 'lint' },
-    { cmd: 'npx tsc --noEmit 2>&1 || true', source: 'static_analysis', category: 'types' },
-    { cmd: 'git status --short 2>&1 || true', source: 'git_history', category: 'status' },
+  const commands: Array<{
+    cmd: string;
+    source: SensorReading["source"];
+    category: string;
+  }> = [
+    {
+      cmd: "npm run lint --silent 2>&1 || true",
+      source: "static_analysis",
+      category: "lint",
+    },
+    {
+      cmd: "npx tsc --noEmit 2>&1 || true",
+      source: "static_analysis",
+      category: "types",
+    },
+    {
+      cmd: "git status --short 2>&1 || true",
+      source: "git_history",
+      category: "status",
+    },
   ];
 
   for (const { cmd, source, category } of commands) {
     try {
       const { stdout } = await execa(cmd, { cwd: repoPath, shell: true });
-      const text = stdout?.trim() || '';
+      const text = stdout?.trim() || "";
       if (text) {
         readings.push({
           id: `${source}-${category}-${Date.now()}`,
           repositoryId,
           source,
           category,
-          severity: 'warn',
+          severity: "warn",
           detail: text.slice(0, 2000),
           raw: { text },
           detectedAt: baseTime,
@@ -33,7 +52,7 @@ export async function analyzeRepository(repositoryId: string, repoPath: string):
         repositoryId,
         source,
         category,
-        severity: 'error',
+        severity: "error",
         detail: (error as Error).message,
         raw: { error: true },
         detectedAt: baseTime,

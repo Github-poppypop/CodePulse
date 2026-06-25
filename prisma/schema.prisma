@@ -1,59 +1,26 @@
-generator client { provider = "prisma-client-js" }
-
-datasource db { url = env("DATABASE_URL") provider = "postgresql" }
-
-model Repository {
-  id            String    @id @default(uuid())
-  owner         String
-  name          String
-  fullName      String    @unique
-  defaultBranch String    @default("main")
-  installedAt   DateTime  @default(now())
-  autonomyLevel String    @default("L1_SUGGEST")
-  updatedAt     DateTime  @updatedAt
-  runs          AgentRun[]
+generator client {
+  provider = "prisma-client-js"
 }
 
-model AgentRun {
-  id           String    @id @default(uuid())
-  repositoryId String
-  runType      String
-  trigger      String
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model AnalysisRun {
+  id          String   @id @default(uuid())
+  repo        String
+  branch      String
+  status      String
+  findingsJson String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model FixRecord {
+  id           String   @id @default(uuid())
+  analysisRunId String
+  patchSummary String
   status       String
-  startedAt    DateTime  @default(now())
-  finishedAt   DateTime?
-  error        String?
-  signals      Signal[]
-  opportunities Opportunity[]
-}
-
-model Signal {
-  id           String   @id @default(uuid())
-  runId        String
-  source       String
-  category     String
-  severity     String
-  filePath     String?
-  line         Int?
-  detail       String
-  raw          String
-  detectedAt   DateTime @default(now())
-}
-
-model Opportunity {
-  id           String   @id @default(uuid())
-  runId        String
-  repositoryId String
-  type         String
-  title        String
-  description  String
-  riskScore    Float    @default(5)
-  impactScore  Float    @default(5)
-  confidence   Float    @default(0.5)
-  status       String   @default("open")
-  prNumber     Int?
-  merged       Boolean  @default(false)
-  metrics      String
   createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
 }

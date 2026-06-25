@@ -1,6 +1,6 @@
-import { createApp } from './server';
-import { env } from './config/env';
-import { connectDatabase } from './db';
+import { createApp } from "./server";
+import { env } from "./config/env";
+import { connectDatabase } from "./db";
 
 const app = createApp();
 

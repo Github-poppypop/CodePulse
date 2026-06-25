@@ -1,12 +1,12 @@
-export type Severity = 'info' | 'low' | 'medium' | 'high' | 'critical';
+export type Severity = "info" | "low" | "medium" | "high" | "critical";
 
 export type FindingCategory =
-  | 'bug'
-  | 'performance'
-  | 'security'
-  | 'maintainability'
-  | 'test_coverage'
-  | 'type_safety';
+  | "bug"
+  | "performance"
+  | "security"
+  | "maintainability"
+  | "test_coverage"
+  | "type_safety";
 
 export interface Finding {
   id: string;
@@ -35,7 +35,17 @@ export interface Fix {
 }
 
 export interface ValidationReport {
-  status: 'passed' | 'failed' | 'requires_review';
+  status: "passed" | "failed" | "requires_review";
+  testsPassed: boolean;
+  typecheckPassed: boolean;
+  lintPassed: boolean;
+  reviewRequired: boolean;
+  warnings: string[];
+  errors: string[];
+}
+
+export interface ValidationReport {
+  status: "passed" | "failed" | "requires_review";
   testsPassed: boolean;
   typecheckPassed: boolean;
   lintPassed: boolean;
@@ -51,19 +61,17 @@ export interface LoopTelemetryEvent {
   payload?: Record<string, unknown>;
 }
 
-export interface MonitorFinding extends Finding {}
-
 export interface ValidationResult {
   report: ValidationReport;
   fix: Fix;
 }
 
 export type AutonomyLevel =
-  | 'observe_only'
-  | 'suggest_only'
-  | 'auto_pr_small'
-  | 'auto_pr_medium'
-  | 'auto_pr_large';
+  | "observe_only"
+  | "suggest_only"
+  | "auto_pr_small"
+  | "auto_pr_medium"
+  | "auto_pr_large";
 
 export interface AutonomyPolicy {
   level: AutonomyLevel;
@@ -81,7 +89,11 @@ export interface LoopServices {
   synthesizePatch: (fix: Fix) => Promise<string>;
   validateFix?: (fix: Fix, patch: string) => Promise<ValidationResult>;
   applyPatch?: (target: string, patch: string) => Promise<void>;
-  createReview?: (fix: Fix, patch: string, report: ValidationReport) => Promise<void>;
+  createReview?: (
+    fix: Fix,
+    patch: string,
+    report: ValidationReport,
+  ) => Promise<void>;
   telemetry: {
     emit: (event: LoopTelemetryEvent) => Promise<void> | void;
   };
@@ -92,14 +104,14 @@ export interface LoopServices {
 }
 
 export type LoopState =
-  | { status: 'idle' }
-  | { status: 'monitoring'; target: string }
-  | { status: 'diagnosing'; finding: Finding }
-  | { status: 'fixing'; fix: Fix }
-  | { status: 'validating'; fix: Fix; patch: string }
-  | { status: 'applying'; fix: Fix; patch: string; report: ValidationReport }
-  | { status: 'paused'; reason: string; lastState: LoopState }
-  | { status: 'error'; error: Error };
+  | { status: "idle" }
+  | { status: "monitoring"; target: string }
+  | { status: "diagnosing"; finding: Finding }
+  | { status: "fixing"; fix: Fix }
+  | { status: "validating"; fix: Fix; patch: string }
+  | { status: "applying"; fix: Fix; patch: string; report: ValidationReport }
+  | { status: "paused"; reason: string; lastState: LoopState }
+  | { status: "error"; error: Error };
 
 export interface LoopRunOutcome {
   runId: string;

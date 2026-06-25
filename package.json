@@ -10,7 +10,8 @@
     "lint": "eslint src --ext .ts",
     "test": "vitest run",
     "db:generate": "prisma migrate dev",
-    "db:push": "prisma db push"
+    "db:push": "prisma db push",
+    "format": "prettier --write src"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.105.0",
@@ -49,5 +50,6 @@
   },
   "engines": {
     "node": ">=20.0.0"
-  }
+  },
+  "type": "module"
 }

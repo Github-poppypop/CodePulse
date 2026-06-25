@@ -1,13 +1,13 @@
-export type Severity = 'info' | 'warn' | 'error' | 'critical';
+export type Severity = "info" | "warn" | "error" | "critical";
 
 export type SourceType =
-  | 'static_analysis'
-  | 'git_history'
-  | 'error_trace'
-  | 'test_report'
-  | 'runtime_metric'
-  | 'security_scan'
-  | 'performance_profile';
+  | "static_analysis"
+  | "git_history"
+  | "error_trace"
+  | "test_report"
+  | "runtime_metric"
+  | "security_scan"
+  | "performance_profile";
 
 export interface SensorReading {
   id: string;
