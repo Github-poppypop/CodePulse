@@ -6,8 +6,24 @@ export default defineConfig({
   server: {
     port: 5173,
     proxy: {
-      "/api": {
-        target: "http://localhost:3005",
+      "/repos": {
+        target: "http://localhost:4000",
+        changeOrigin: true,
+      },
+      "/runs": {
+        target: "http://localhost:4000",
+        changeOrigin: true,
+      },
+      "/findings": {
+        target: "http://localhost:4000",
+        changeOrigin: true,
+      },
+      "/health": {
+        target: "http://localhost:4000",
+        changeOrigin: true,
+      },
+      "/webhooks": {
+        target: "http://localhost:4000",
         changeOrigin: true,
       },
     },
