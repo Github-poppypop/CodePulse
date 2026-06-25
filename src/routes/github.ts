@@ -14,12 +14,11 @@ export const githubPlugin: FastifyPluginAsync = async (app) => {
 
     const [owner, name] = body.repository.full_name.split("/");
     const repo = await prisma.repository.upsert({
-      where: { fullName: body.repository.full_name },
+      where: { url: `https://github.com/${body.repository.full_name}` },
       create: {
         owner,
         name,
-        fullName: body.repository.full_name,
-        installedById: "",
+        url: `https://github.com/${body.repository.full_name}`,
       },
       update: {},
     });
