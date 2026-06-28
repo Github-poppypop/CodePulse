@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { LLMRouter, createDefaultRouter } from "../llm/router";
+import { createDefaultRouter } from "../llm/router";
 import { OpenRouterProvider } from "../llm/openrouter";
 import { ProviderType } from "../llm/providers";
 
