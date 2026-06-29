@@ -83,14 +83,19 @@ export const CardDescription = forwardRef<HTMLParagraphElement, CardDescriptionP
 
 CardDescription.displayName = 'CardDescription';
 
-export interface CardContentProps extends HTMLAttributes<HTMLDivElement> {}
+export interface CardContentProps extends HTMLAttributes<HTMLDivElement> {
+  padding?: 'none' | 'sm' | 'md' | 'lg';
+}
 
 export const CardContent = forwardRef<HTMLDivElement, CardContentProps>(
-  ({ className, children, ...props }, ref) => (
-    <div ref={ref} className={cn(className)} {...props}>
-      {children}
-    </div>
-  )
+  ({ className, padding = 'md', children, ...props }, ref) => {
+    const paddings: Record<string, string> = { none: '', sm: 'p-2', md: 'p-4', lg: 'p-6' };
+    return (
+      <div ref={ref} className={cn(paddings[padding], className)} {...props}>
+        {children}
+      </div>
+    );
+  }
 );
 
 CardContent.displayName = 'CardContent';

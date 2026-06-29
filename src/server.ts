@@ -1,6 +1,8 @@
 import fastify from "fastify";
+import cors from "@fastify/cors";
 import { rootPlugin } from "./routes/root";
 import { githubPlugin } from "./routes/github";
+import { apiPlugin } from "./routes/api";
 import { env } from "./config/env";
 
 export function createApp() {
@@ -12,8 +14,10 @@ export function createApp() {
     },
   });
 
+  app.register(cors, { origin: true });
   app.register(rootPlugin);
   app.register(githubPlugin);
+  app.register(apiPlugin);
 
   app.setErrorHandler((error, request, reply) => {
     request.log.error(error, "Unhandled application error");

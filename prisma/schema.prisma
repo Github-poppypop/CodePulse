@@ -13,10 +13,14 @@ model Repository {
   owner       String
   url         String   @unique
   branch      String   @default("main")
+  orgId       String?
+  organization Organization? @relation(fields: [orgId], references: [id])
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   runs        Run[]
   findings    Finding[]
+  schedules   Schedule[]
+  dependencies Dependency[]
 }
 
 model Run {
@@ -58,6 +62,10 @@ model Finding {
   codeSnippet   String?
   source        String         @default("sensor")
   metadata      Json?
+  githubIssueNumber Int?
+  githubIssueUrl    String?
+  fingerprint         String?
+  confidence          Int?
   createdAt     DateTime       @default(now())
   fixes         Fix[]
 }
@@ -66,6 +74,7 @@ enum FindingCategory {
   BUG
   PERFORMANCE
   SECURITY
+  SECRETS
   STYLE
   REFACTOR
   TEST
@@ -103,6 +112,8 @@ enum FixStatus {
   APPLIED
   REJECTED
   FAILED
+  PENDING_PR
+  ROLLED_BACK
 }
 
 model ValidationResult {
@@ -123,6 +134,9 @@ model TelemetryEvent {
   runId       String
   run         Run      @relation(fields: [runId], references: [id], onDelete: Cascade)
   type        String
+  provider    String   @default("openrouter")
+  tokenCount  Int      @default(0)
+  cost        Float    @default(0)
   payload     Json?
   createdAt   DateTime @default(now())
 }
@@ -150,4 +164,129 @@ enum AutonomyLevel {
   ASSISTED
   SEMI_AUTONOMOUS
   FULLY_AUTONOMOUS
+}
+
+model Organization {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  members     Member[]
+  repositories Repository[]
+}
+
+model Member {
+  id              String   @id @default(cuid())
+  organizationId  String
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  userId          String
+  email           String
+  role            String   @default("MEMBER")
+  status          String   @default("ACTIVE")
+  invitedAt       DateTime @default(now())
+}
+
+model Schedule {
+  id              String   @id @default(cuid())
+  repositoryId    String
+  repository      Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  cron            String
+  trigger         String   @default("schedule")
+  enabled         Boolean  @default(true)
+  lastRun         DateTime?
+  createdAt       DateTime @default(now())
+}
+
+model Dependency {
+  id              String   @id @default(cuid())
+  repositoryId    String
+  repository      Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  name            String
+  version         String
+  latestVersion   String?
+  severity        Severity @default(LOW)
+  advisoryUrl     String?
+  autoFixAvailable Boolean @default(false)
+}
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  actor       String
+  action      String
+  resource    String
+  metadata    Json?
+  createdAt   DateTime @default(now())
+}
+
+model Runner {
+  id          String   @id @default(cuid())
+  name        String
+  provider    String
+  type        String
+  status      String   @default("IDLE")
+  concurrency Int      @default(2)
+  lastPing    DateTime?
+  createdAt   DateTime @default(now())
+}
+
+model Benchmark {
+  id          String   @id @default(cuid())
+  provider    String
+  taskType    String
+  score       Float
+  tokenCount  Int
+  duration    Int
+  runAt       DateTime @default(now())
+  suiteId     String?
+  suite       BenchmarkSuite? @relation(fields: [suiteId], references: [id])
+}
+
+model BenchmarkSuite {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  benchmarks  Benchmark[]
+  createdAt   DateTime @default(now())
+}
+
+model NotificationSettings {
+  id              String   @id @default(cuid())
+  userId          String?
+  orgId           String?
+  channel         String
+  webhookUrl      String?
+  digestMode      String   @default("immediate")
+  eventTypes      String
+  enabled         Boolean  @default(true)
+  createdAt       DateTime @default(now())
+}
+
+model CustomSensor {
+  id              String   @id @default(cuid())
+  name            String
+  description     String?
+  language        String   @default("typescript")
+  sourceCode      String
+  enabled         Boolean  @default(true)
+  repositoryId    String?
+  createdAt       DateTime @default(now())
+}
+
+model CollaborationThread {
+  id              String   @id @default(cuid())
+  findingId       String
+  resolved        Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  comments        CollaborationComment[]
+}
+
+model CollaborationComment {
+  id              String   @id @default(cuid())
+  threadId        String
+  thread          CollaborationThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  authorId        String
+  content         String
+  mentions        String
+  createdAt       DateTime @default(now())
 }
