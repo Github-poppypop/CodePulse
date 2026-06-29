@@ -169,7 +169,7 @@ export const apiPlugin: FastifyPluginAsync = async (app) => {
   });
 
   app.put("/api/notifications/settings", async (request, reply) => {
-    const settings = request.body as any;
+    const settings = request.body as { id?: string; userId?: string; orgId?: string; channel?: string; webhookUrl?: string; digestMode?: string; eventTypes?: string; enabled?: boolean };
     const updated = await prisma.notificationSettings.upsert({
       where: { id: settings.id || "default" },
       create: settings,
