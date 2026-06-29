@@ -48,8 +48,12 @@ export interface Finding {
   filePath: string | null;
   lineStart: number | null;
   lineEnd: number | null;
+  lineNumber?: number;
   source: string;
   createdAt: string;
+  confidence?: number;
+  codeSnippet?: string;
+  suggestedFix?: string;
 }
 
 // Missing types from imports
